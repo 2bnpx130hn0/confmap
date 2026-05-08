@@ -49,6 +49,12 @@ func (ix *Indexer) Rebuild(cfg map[string]any) {
 	ix.index = next
 }
 
+// Has reports whether the given dot-notation key exists in the index.
+func (ix *Indexer) Has(key string) bool {
+	_, ok := ix.index[key]
+	return ok
+}
+
 // flatten recursively walks src, writing dot-separated keys into dst.
 func flatten(prefix string, src map[string]any, dst map[string]any) {
 	for k, v := range src {
