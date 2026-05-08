@@ -85,3 +85,22 @@ func TestClear(t *testing.T) {
 		t.Error("expected empty log after Clear")
 	}
 }
+
+func TestRecord_MultipleChanges(t *testing.T) {
+	a := auditor.New()
+	old := map[string]interface{}{"host": "localhost", "port": 8080}
+	new_ := map[string]interface{}{"host": "remotehost", "timeout": 30}
+	a.Record(old, new_, "merge")
+	evts := a.Events()
+	// Expect: host updated, port deleted, timeout set
+	if len(evts) != 3 {
+		t.Fatalf("expected 3 events, got %d", len(evts))
+	}
+	kinds := map[auditor.EventKind]int{}
+	for _, e := range evts {
+		kinds[e.Kind]++
+	}
+	if kinds[auditor.EventUpdate] != 1 || kinds[auditor.EventDelete] != 1 || kinds[auditor.EventSet] != 1 {
+		t.Errorf("unexpected event kind counts: %v", kinds)
+	}
+}
