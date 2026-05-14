@@ -85,3 +85,29 @@ func TestDiff_BothEmpty(t *testing.T) {
 		t.Errorf("expected no deltas, got %d", len(deltas))
 	}
 }
+
+func TestDiff_MultipleChanges(t *testing.T) {
+	d := differ.New()
+	oldCfg := map[string]interface{}{"host": "localhost", "port": 8080, "debug": true}
+	newCfg := map[string]interface{}{"host": "prod.example.com", "port": 9090}
+
+	deltas := d.Diff(oldCfg, newCfg)
+	if len(deltas) != 3 {
+		t.Fatalf("expected 3 deltas, got %d", len(deltas))
+	}
+
+	deltaByKey := make(map[string]differ.Delta)
+	for _, delta := range deltas {
+		deltaByKey[delta.Key] = delta
+	}
+
+	if deltaByKey["host"].Type != differ.Changed {
+		t.Errorf("expected host to be Changed, got %s", deltaByKey["host"].Type)
+	}
+	if deltaByKey["port"].Type != differ.Changed {
+		t.Errorf("expected port to be Changed, got %s", deltaByKey["port"].Type)
+	}
+	if deltaByKey["debug"].Type != differ.Removed {
+		t.Errorf("expected debug to be Removed, got %s", deltaByKey["debug"].Type)
+	}
+}
