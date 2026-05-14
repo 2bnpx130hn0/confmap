@@ -37,3 +37,13 @@ func (tr *TaggedResolver) ResolveFiltered(tag string) (map[string]any, error) {
 	}
 	return tr.tagger.FilterByTag(cfg, tag), nil
 }
+
+// Tags returns the set of distinct tags present across all keys in the
+// resolved config, which can be used to enumerate available filter values.
+func (tr *TaggedResolver) Tags() ([]string, error) {
+	cfg, err := tr.resolver.Resolve()
+	if err != nil {
+		return nil, err
+	}
+	return tr.tagger.ListTags(cfg), nil
+}
