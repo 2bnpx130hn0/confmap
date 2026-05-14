@@ -76,3 +76,18 @@ func TestMerge_EmptyLayers(t *testing.T) {
 		t.Errorf("expected empty result, got %v", result)
 	}
 }
+
+func TestMerge_SingleLayer(t *testing.T) {
+	m := New(StrategyOverride)
+	input := map[string]any{"key": "value", "num": 42}
+	result, err := m.Merge(input)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if result["key"] != "value" {
+		t.Errorf("expected key=value, got %v", result["key"])
+	}
+	if result["num"] != 42 {
+		t.Errorf("expected num=42, got %v", result["num"])
+	}
+}
