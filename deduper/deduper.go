@@ -90,3 +90,16 @@ func countKeys(m map[string]any) int {
 	}
 	return count
 }
+
+// HasDuplicateKeys reports whether the given config map contains any duplicate
+// flattened key paths. It does not modify the Deduper's internal state.
+func (d *Deduper) HasDuplicateKeys(config map[string]any) (bool, error) {
+	if config == nil {
+		return false, fmt.Errorf("deduper: config must not be nil")
+	}
+	originalSeen := d.seenKeys
+	d.seenKeys = make(map[string]struct{})
+	deduped := d.dedupeMap(config, "")
+	d.seenKeys = originalSeen
+	return countKeys(deduped) != countKeys(config), nil
+}
